@@ -1,0 +1,17 @@
+# IDE directories and files
+.vscode/
+.idea/
+
+# Build artifacts
+build/
+bin/
+*.o
+*.a
+*.so
+
+# Executables
+a.out
+*.exe
+
+# Cache files
+*.log
