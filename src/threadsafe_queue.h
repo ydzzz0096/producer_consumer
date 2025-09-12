@@ -1,14 +1,15 @@
 #pragma once
+
 #include <queue>
 #include <mutex>
 #include <condition_variable>
 #include <optional>
 
-template<typename T>
+template <typename T>
 class ThreadSafeQueue {
 public:
     ThreadSafeQueue() = default;
-
+    
     // push value into queue
     void push(T value) {
         {
@@ -21,8 +22,11 @@ public:
     // pop blocks until item or stop called; returns std::nullopt if stopped and empty
     std::optional<T> pop() {
         std::unique_lock<std::mutex> lk(m_);
-        cv_.wait(lk, [&]{ return stopped_ || !q_.empty(); });
-        if (q_.empty()) return std::nullopt;
+        cv_.wait(lk, [this]{ return stopped_ || !q_.empty(); });
+
+        if (stopped_ && q_.empty()) {
+            return std::nullopt;
+        }
         T v = std::move(q_.front());
         q_.pop();
         return v;
