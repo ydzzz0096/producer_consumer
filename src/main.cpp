@@ -6,7 +6,8 @@
 
 using namespace std::chrono_literals;
 
-int main() {
+int main() 
+{
     ThreadSafeQueue<int> q;
 
     // producer thread
