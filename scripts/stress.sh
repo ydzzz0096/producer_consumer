@@ -4,4 +4,4 @@ mkdir -p build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
 # 直接运行
-./pc_demo
+./pc_test
