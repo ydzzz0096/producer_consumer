@@ -22,14 +22,19 @@ public:
     // pop blocks until item or stop called; returns std::nullopt if stopped and empty
     std::optional<T> pop() {
         std::unique_lock<std::mutex> lk(m_);
-        cv_.wait(lk, [this]{ return stopped_ || !q_.empty(); });
+        cv_.wait(lk, [this]{ return !q_.empty() || stopped_; });
 
-        if (stopped_ && q_.empty()) {
-            return std::nullopt;
+        // 关键修改：只要队列不为空，就优先处理数据
+        if (!q_.empty()) {
+            T v = std::move(q_.front());
+            q_.pop();
+            return v;
         }
-        T v = std::move(q_.front());
-        q_.pop();
-        return v;
+
+        // 如果代码能执行到这里，说明队列一定是空的。
+        // 而能从 wait 唤醒，只可能是因为 stopped_ == true。
+        // 所以直接返回 nullopt 即可。
+        return std::nullopt;
     }
 
     void stop() {
